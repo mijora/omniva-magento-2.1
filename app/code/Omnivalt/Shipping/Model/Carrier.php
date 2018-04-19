@@ -154,6 +154,11 @@ class Carrier extends AbstractCarrierOnline implements \Magento\Shipping\Model\C
     private $XMLparser;
     
     protected $configWriter;
+    /**
+     * Session instance reference
+     * 
+     */
+    protected $_checkoutSession;
 
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -199,8 +204,11 @@ class Carrier extends AbstractCarrierOnline implements \Magento\Shipping\Model\C
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
         \Magento\Framework\Xml\Parser $parser,
         \Magento\Framework\App\Config\Storage\WriterInterface $configWriter,
+        \Magento\Checkout\Model\Session $checkoutSession,
         array $data = []
     ) {
+        $this->_checkoutSession = $checkoutSession;
+
         $this->_storeManager = $storeManager;
         $this->_productCollectionFactory = $productCollectionFactory;
         $this->XMLparser = $parser;
@@ -274,12 +282,38 @@ class Carrier extends AbstractCarrierOnline implements \Magento\Shipping\Model\C
             $method->setMethod($allowedMethod);
             $method->setMethodTitle($this->getCode('method', $allowedMethod));
             $amount = $this->getConfigData('price');
-            if ($allowedMethod == "COURIER")
-              $amount = $this->getConfigData('price');
-            if ($allowedMethod == "PARCEL_TERMINAL")
-              $amount = $this->getConfigData('price2');
+
+            $country_id =  $this->_checkoutSession->getQuote()
+            ->getShippingAddress()
+            ->getCountryId();
+            
+            if ($allowedMethod == "COURIER") {
+              switch($country_id) {
+                case 'LV':
+                    $amount = $this->getConfigData('priceLV_C');
+                    break;
+                case 'EE':
+                    $amount = $this->getConfigData('priceEE_C');
+                    break;
+                default:
+                    $amount = $this->getConfigData('price');
+              }
+            }
+            if ($allowedMethod == "PARCEL_TERMINAL") {
+              switch($country_id) {
+                case 'LV':
+                    $amount = $this->getConfigData('priceLV_pt');
+                    break;
+                case 'EE':
+                    $amount = $this->getConfigData('priceEE_pt');
+                    break;
+                default:
+                    $amount = $this->getConfigData('price2');
+              }
+            }
             if ($free)
               $amount = 0;
+
             $method->setPrice($amount);
             $method->setCost($amount);
         
