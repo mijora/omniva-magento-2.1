@@ -6,5 +6,5 @@
                     <item name="stickyTmpl" xsi:type="string">ui/grid/sticky/toolbar</item>
                 </item>
             </argument>
-        </container name="listing_top">
+        </container>
     </listing>
