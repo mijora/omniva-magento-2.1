@@ -161,20 +161,21 @@ class PrintMassManifest extends \Magento\Sales\Controller\Adminhtml\Order\Abstra
     $postcode         = $this->omnivalt_carrier->getConfigData('company_postcode');
     $city             = $this->omnivalt_carrier->getConfigData('company_city');
     $country          = $this->omnivalt_carrier->getConfigData('company_countrycode');
+
     $pdf->SetFont('freeserif', '', 14);
     $country   = $objectManager->create('\Magento\Directory\Model\Country')->load($country);
-    $shop_addr = '<table cellspacing="0" cellpadding="1" border="0"><tr><td>' . date('Y-m-d H:i:s') . '</td><td>Siuntėjo adresas:<br/>' . $name . '<br/>' . $street . ', ' . $postcode . '<br/>' . $city . ', ' . $country->getName() . '<br/></td></tr></table>';
+    $shop_addr = '<table cellspacing="0" cellpadding="1" border="0"><tr><td>' . date('Y-m-d H:i:s') . '</td><td>'. __('Sender Address') .':<br/>' . $name . '<br/>' . $street . ', ' . $postcode . '<br/>' . $city . ', ' . $country->getName() . '<br/></td></tr></table>';
     $pdf->writeHTML($shop_addr, true, false, false, false, '');
     $tbl = '
         <table cellspacing="0" cellpadding="4" border="1">
           <thead>
             <tr>
               <th width = "40" align="right">Nr.</th>
-              <th>Siuntos numeris</th>
-              <th width = "60">Data</th>
-              <th width = "40" >Kiekis</th>
-              <th width = "60">Svoris (kg)</th>
-              <th width = "210">Gavėjo adresas</th>
+              <th>'. __('Parcel Nr.') .'</th>
+              <th width = "60">'. __('Date') .'</th>
+              <th width = "40" >'. __('Amount') .'</th>
+              <th width = "60">'. __('Weight') .' (kg)</th>
+              <th width = "210">'. __('Receiver') .'</th>
             </tr>
           </thead>
           <tbody>
@@ -192,8 +193,8 @@ class PrintMassManifest extends \Magento\Sales\Controller\Adminhtml\Order\Abstra
     $pdf->SetFont('freeserif', '', 9);
     $pdf->writeHTML($tbl, true, false, false, false, '');
     $pdf->SetFont('freeserif', '', 14);
-    $sign = 'Kurjerio vardas, pavardė, parašas ________________________________________________<br/><br/>';
-    $sign .= 'Siuntėjo vardas, pavardė, parašas ________________________________________________';
+    $sign = __('Courier full name, signature').' ________________________________________________<br/><br/>';
+    $sign .= __('Sender full name, signature').' ________________________________________________';
     $pdf->writeHTML($sign, true, false, false, false, '');
     $pdf->Output('Omnivalt_manifest_' . date('Y-m-d H.i.s') . '.pdf', 'D');
   }
